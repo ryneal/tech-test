@@ -8,6 +8,16 @@ import static org.junit.Assert.*;
 public class PersonTest {
 
     @Test
+    public void shouldBeAbleToSetAndGetId() throws Exception {
+        Person person = new Person();
+        person.setId(118L);
+
+        Long result = person.getId();
+
+        assertThat(118L, is(result));
+    }
+
+    @Test
     public void shouldBeAbleToSetAndGetFirstname() throws Exception {
         Person person = new Person();
         person.setFirstname("Test");
