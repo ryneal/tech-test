@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/")
 public class PersonController {
@@ -19,21 +21,24 @@ public class PersonController {
 
     @GetMapping
     public ModelAndView list() {
-        return null;
+        return new ModelAndView("people/list", "people", personService.getPeople());
     }
 
     @GetMapping("{id}")
     public ModelAndView view(@PathVariable("id") Person person) {
-        return null;
+        return new ModelAndView("people/view", "person", person);
     }
 
     @GetMapping("delete/{id}")
     public ModelAndView delete(@PathVariable("id") Long id) {
-        return null;
+        personService.delete(id);
+        List<Person> people = personService.getPeople();
+        return new ModelAndView("people/list", "people", people);
     }
 
     @PostMapping
     public ModelAndView create(Person person) {
-        return null;
+        Person created = personService.save(person);
+        return new ModelAndView("redirect:/{person.id}", "person.id", created.getId());
     }
 }

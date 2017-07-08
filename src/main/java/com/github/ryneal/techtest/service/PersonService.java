@@ -12,7 +12,11 @@ public class PersonService {
         return null;
     }
 
-    public void save(Person person) {
+    public Person save(Person person) {
+        throw new NotImplementedException();
+    }
+
+    public void delete(Long id) {
         throw new NotImplementedException();
     }
 }

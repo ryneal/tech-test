@@ -2,9 +2,11 @@ package com.github.ryneal.techtest.controller;
 
 import com.github.ryneal.techtest.model.Person;
 import com.github.ryneal.techtest.service.PersonService;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Arrays;
@@ -15,17 +17,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
+@RunWith(SpringRunner.class)
 public class PersonControllerTest {
 
-    private PersonController personController = new PersonController();
-
-    @MockBean
+    @Mock
     private PersonService personService;
 
-    @Before
-    public void setUp() throws Exception {
-        personService = mock(PersonService.class);
-    }
+    @InjectMocks
+    private PersonController personController = new PersonController();
 
     @Test
     public void shouldGetListOfPeople() throws Exception {
@@ -39,7 +38,7 @@ public class PersonControllerTest {
 
         assertThat(actual, is(result));
         assertThat("people/list", is(viewName));
-        verify(personService.getPeople());
+        verify(personService).getPeople();
         verifyNoMoreInteractions(personService);
     }
 
@@ -70,7 +69,8 @@ public class PersonControllerTest {
 
         assertThat(actual, is(result));
         assertThat("people/list", is(viewName));
-        verify(personService.getPeople());
+        verify(personService).delete(66L);
+        verify(personService).getPeople();
         verifyNoMoreInteractions(personService);
     }
 
@@ -78,13 +78,14 @@ public class PersonControllerTest {
     public void shouldCreatePersonAndRedirectToViewPerson() throws Exception {
         Person actual = new Person();
         actual.setId(86L);
+        when(personService.save(any())).thenReturn(actual);
 
         ModelAndView modelAndView = personController.create(actual);
         Map<String, Object> model = modelAndView.getModel();
         Object result = model.get("person.id");
         String viewName = modelAndView.getViewName();
 
-        assertThat(actual, is(result));
+        assertThat(actual.getId(), is(result));
         assertThat(viewName, is("redirect:/{person.id}"));
         verify(personService).save(actual);
         verifyNoMoreInteractions(personService);
