@@ -5,12 +5,11 @@ import com.github.ryneal.techtest.model.Person;
 import com.github.ryneal.techtest.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -62,13 +61,8 @@ public class PersonController {
     @PostMapping
     public ModelAndView create(@Valid Person person, BindingResult result) {
         if (result.hasErrors()) {
-            ModelAndView mav = new ModelAndView("redirect:edit/{person.id}");
-            if (person.getId() == null) {
-                mav.setViewName("redirect:/create");
-            }
+            ModelAndView mav = new ModelAndView("people/edit");
             mav.addObject("person", person);
-            mav.addObject("person.id", person.getId());
-            mav.addObject("fields", result);
             return mav;
         }
         return create(person);

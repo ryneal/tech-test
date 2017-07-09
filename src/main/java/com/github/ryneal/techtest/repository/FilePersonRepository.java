@@ -80,7 +80,7 @@ public class FilePersonRepository implements PersonRepository {
         while(!found) {
             index++;
             final Long search = index;
-            found = people.stream().anyMatch(p -> p.getId().equals(search));
+            found = !people.stream().anyMatch(p -> p.getId().equals(search));
         }
         return index;
     }
