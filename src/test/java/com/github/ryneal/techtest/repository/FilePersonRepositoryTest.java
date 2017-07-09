@@ -9,10 +9,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -35,9 +32,9 @@ public class FilePersonRepositoryTest {
         List<Person> list = Collections.singletonList(actual);
         when(ioUtil.readDataFile()).thenReturn(list);
 
-        Person result = personRepository.find(1L);
+        Optional<Person> result = personRepository.find(1L);
 
-        assertThat(actual, is(result));
+        assertThat(actual, is(result.get()));
         verify(ioUtil).readDataFile();
         verifyNoMoreInteractions(ioUtil);
     }
@@ -49,9 +46,9 @@ public class FilePersonRepositoryTest {
         List<Person> list = Collections.singletonList(person);
         when(ioUtil.readDataFile()).thenReturn(list);
 
-        Person result = personRepository.find(2L);
+        Optional<Person> result = personRepository.find(2L);
 
-        assertThat(result, is(nullValue()));
+        assertThat(result.get(), is(nullValue()));
         verify(ioUtil).readDataFile();
         verifyNoMoreInteractions(ioUtil);
     }

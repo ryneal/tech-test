@@ -1,5 +1,6 @@
 package com.github.ryneal.techtest.controller;
 
+import com.github.ryneal.techtest.exception.PersonNotFoundException;
 import com.github.ryneal.techtest.model.Person;
 import com.github.ryneal.techtest.repository.PersonRepository;
 import org.junit.Test;
@@ -8,19 +9,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
@@ -50,17 +46,26 @@ public class PersonControllerTest {
 
     @Test
     public void shouldGetViewOfPerson() throws Exception {
-        Person actual = new Person();
-        actual.setId(77L);
-        when(personRepository.find(actual.getId())).thenReturn(actual);
+        Person person = new Person();
+        person.setId(77L);
+        Optional<Person> actual = Optional.of(person);
+        when(personRepository.find(person.getId())).thenReturn(actual);
 
-        ModelAndView modelAndView = personController.view(actual.getId());
+        ModelAndView modelAndView = personController.view(person.getId());
         Map<String, Object> model = modelAndView.getModel();
         String viewName = modelAndView.getViewName();
         Object result = model.get("person");
 
-        assertThat(actual, is(result));
+        assertThat(person, is(result));
         assertThat("people/view", is(viewName));
+    }
+
+    @Test(expected = PersonNotFoundException.class)
+    public void shouldGetThrowExceptionIfNoPersonFound() throws Exception {
+        Optional<Person> actual = Optional.empty();
+        when(personRepository.find(89L)).thenReturn(actual);
+
+        ModelAndView modelAndView = personController.view(89L);
     }
 
     @Test
@@ -114,7 +119,7 @@ public class PersonControllerTest {
     public void shouldGetEditPageWithExistingPersonObject() throws Exception {
         Person actual = new Person();
         actual.setId(77L);
-        when(personRepository.find(actual.getId())).thenReturn(actual);
+        when(personRepository.find(actual.getId())).thenReturn(Optional.of(actual));
 
         ModelAndView modelAndView = personController.edit(77L);
         Map<String, Object> model = modelAndView.getModel();
@@ -138,11 +143,9 @@ public class PersonControllerTest {
         ModelAndView modelAndView = personController.create(actual, results);
         Map<String, Object> model = modelAndView.getModel();
         Object personId = model.get("person.id");
-        Object errors = model.get("errors");
         String viewName = modelAndView.getViewName();
 
         assertThat(actual.getId(), is(personId));
-        assertThat(errors, is(nullValue()));
         assertThat(viewName, is("redirect:/{person.id}"));
     }
 
@@ -160,12 +163,10 @@ public class PersonControllerTest {
         ModelAndView modelAndView = personController.create(actual, results);
         Map<String, Object> model = modelAndView.getModel();
         Object personId = model.get("person.id");
-        Object errors = model.get("errors");
         String viewName = modelAndView.getViewName();
 
         assertThat(actual.getId(), is(personId));
-        assertThat(errors, is(errorList));
-        assertThat(viewName, is("redirect:/{person.id}"));
+        assertThat(viewName, is("redirect:edit/{person.id}"));
     }
 
     @Test
@@ -181,11 +182,9 @@ public class PersonControllerTest {
         ModelAndView modelAndView = personController.create(actual, results);
         Map<String, Object> model = modelAndView.getModel();
         Object person = model.get("person");
-        Object errors = model.get("errors");
         String viewName = modelAndView.getViewName();
 
         assertThat(actual, is(person));
-        assertThat(errors, is(errorList));
         assertThat(viewName, is("redirect:/create"));
     }
 

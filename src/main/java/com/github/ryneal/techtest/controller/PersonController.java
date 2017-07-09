@@ -1,5 +1,6 @@
 package com.github.ryneal.techtest.controller;
 
+import com.github.ryneal.techtest.exception.PersonNotFoundException;
 import com.github.ryneal.techtest.model.Person;
 import com.github.ryneal.techtest.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/")
@@ -29,9 +29,10 @@ public class PersonController {
     }
 
     @GetMapping("edit/{id}")
-    public ModelAndView edit(@PathVariable("id") Long id) {
-        Person person = personRepository.find(id);
-        return new ModelAndView("people/edit", "person", person);
+    public ModelAndView edit(@PathVariable("id") Long id) throws PersonNotFoundException {
+        Optional<Person> person = personRepository.find(id);
+        return new ModelAndView("people/edit", "person",
+                person.orElseThrow(PersonNotFoundException::new));
     }
 
     @GetMapping("create")
@@ -40,9 +41,10 @@ public class PersonController {
     }
 
     @GetMapping("{id}")
-    public ModelAndView view(@PathVariable("id") Long id) {
-        Person person = personRepository.find(id);
-        return new ModelAndView("people/view", "person", person);
+    public ModelAndView view(@PathVariable("id") Long id) throws PersonNotFoundException {
+        Optional<Person> person = personRepository.find(id);
+        return new ModelAndView("people/view", "person",
+                person.orElseThrow(PersonNotFoundException::new));
     }
 
     @GetMapping("delete/{id}")
@@ -60,16 +62,16 @@ public class PersonController {
     @PostMapping
     public ModelAndView create(@Valid Person person, BindingResult result) {
         if (result.hasErrors()) {
-            Map model = new HashMap();
-            String redirectView = "redirect:/{person.id}";
+            ModelAndView mav = new ModelAndView("redirect:edit/{person.id}");
             if (person.getId() == null) {
-                redirectView = "redirect:/create";
+                mav.setViewName("redirect:/create");
             }
-            model.put("person", person);
-            model.put("person.id", person.getId());
-            model.put("errors", result.getAllErrors());
-            return new ModelAndView(redirectView, model);
+            mav.addObject("person", person);
+            mav.addObject("person.id", person.getId());
+            mav.addObject("fields", result);
+            return mav;
         }
         return create(person);
     }
+
 }
