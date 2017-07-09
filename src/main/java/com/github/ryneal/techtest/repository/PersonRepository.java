@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PersonRepository {
-    Optional<Person> find(Long id);
+    Optional<Person> find(final Long id);
     List<Person> findAll();
-    Person save(Person person);
-    void delete(Long id);
+    Person save(final Person person);
+    void delete(final Long id);
 }

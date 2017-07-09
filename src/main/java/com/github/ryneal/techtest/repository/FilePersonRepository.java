@@ -2,7 +2,6 @@ package com.github.ryneal.techtest.repository;
 
 import com.github.ryneal.techtest.model.Person;
 import com.github.ryneal.techtest.repository.io.PersonInputOutputUtil;
-import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +18,7 @@ public class FilePersonRepository implements PersonRepository {
     private PersonInputOutputUtil ioUtil;
 
     @Override
-    public Optional<Person> find(Long id) {
+    public Optional<Person> find(final Long id) {
         return findAll().stream().filter(p -> p.getId().equals(id)).findFirst();
     }
 
@@ -33,10 +32,17 @@ public class FilePersonRepository implements PersonRepository {
     }
 
     @Override
-    public Person save(Person person) {
+    public Person save(final Person person) {
         List<Person> people = findAll();
-        int size = people.size();
 
+        people = updateListWithPerson(people, person);
+
+        ioUtil.writeToDataFile(people);
+
+        return person;
+    }
+
+    protected List<Person> updateListWithPerson(final List<Person> people, final Person person) {
         if (person.getId() == null) {
             Long newId = findAvailableId(people);
             person.setId(newId);
@@ -44,22 +50,18 @@ public class FilePersonRepository implements PersonRepository {
 
         int index = findIndexOfPersonId(person.getId(), people);
 
-        if (index != -1 && size > 0) {
+        if (index != -1) {
             people.set(index, person);
-        } else {
-            if(size == 0) {
-                people = new ArrayList<>();
-            }
-            people.add(person);
+            return people;
         }
 
-        ioUtil.writeToDataFile(people);
-
-        return person;
+        List<Person> newPeople = new ArrayList<>(people);
+        newPeople.add(person);
+        return newPeople;
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(final Long id) {
         List<Person> people = findAll();
         int index = findIndexOfPersonId(id, people);
         if (index != -1) {
@@ -77,7 +79,7 @@ public class FilePersonRepository implements PersonRepository {
     private Long findAvailableId(final List<Person> people) {
         boolean found = false;
         Long index = 0L;
-        while(!found) {
+        while (!found) {
             index++;
             final Long search = index;
             found = !people.stream().anyMatch(p -> p.getId().equals(search));

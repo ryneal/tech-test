@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.google.common.io.Files.asCharSource;
-import static com.google.common.io.Files.newWriter;
 
 @Component
 public class PersonInputOutputUtil {
@@ -31,7 +30,7 @@ public class PersonInputOutputUtil {
         }
     }
 
-    public void writeToDataFile(List<Person> list) {
+    public void writeToDataFile(final List<Person> list) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String valueAsString = mapper.writeValueAsString(list);

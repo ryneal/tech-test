@@ -12,7 +12,7 @@ public class Person {
     @NotEmpty(message = "Surname is required.")
     private String surname;
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -20,7 +20,7 @@ public class Person {
         return id;
     }
 
-    public void setFirstname(String firstname) {
+    public void setFirstname(final String firstname) {
         this.firstname = firstname;
     }
 
@@ -28,7 +28,7 @@ public class Person {
         return firstname;
     }
 
-    public void setSurname(String surname) {
+    public void setSurname(final String surname) {
         this.surname = surname;
     }
 

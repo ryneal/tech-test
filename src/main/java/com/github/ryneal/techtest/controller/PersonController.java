@@ -5,11 +5,12 @@ import com.github.ryneal.techtest.model.Person;
 import com.github.ryneal.techtest.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -28,7 +29,7 @@ public class PersonController {
     }
 
     @GetMapping("edit/{id}")
-    public ModelAndView edit(@PathVariable("id") Long id) throws PersonNotFoundException {
+    public ModelAndView edit(@PathVariable("id") final Long id) throws PersonNotFoundException {
         Optional<Person> person = personRepository.find(id);
         return new ModelAndView("people/edit", "person",
                 person.orElseThrow(PersonNotFoundException::new));
@@ -40,26 +41,26 @@ public class PersonController {
     }
 
     @GetMapping("{id}")
-    public ModelAndView view(@PathVariable("id") Long id) throws PersonNotFoundException {
+    public ModelAndView view(@PathVariable("id") final Long id) throws PersonNotFoundException {
         Optional<Person> person = personRepository.find(id);
         return new ModelAndView("people/view", "person",
                 person.orElseThrow(PersonNotFoundException::new));
     }
 
     @GetMapping("delete/{id}")
-    public ModelAndView delete(@PathVariable("id") Long id) {
+    public ModelAndView delete(@PathVariable("id") final Long id) {
         personRepository.delete(id);
         List<Person> people = personRepository.findAll();
         return new ModelAndView("people/list", "people", people);
     }
 
-    public ModelAndView create(Person person) {
-        Person created = personRepository.save(person);
+    protected ModelAndView create(final Person person) {
+        final Person created = personRepository.save(person);
         return new ModelAndView("redirect:/{person.id}", "person.id", created.getId());
     }
 
     @PostMapping
-    public ModelAndView create(@Valid Person person, BindingResult result) {
+    public ModelAndView create(@Valid final Person person, final BindingResult result) {
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView("people/edit");
             mav.addObject("person", person);

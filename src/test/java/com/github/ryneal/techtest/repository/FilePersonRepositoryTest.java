@@ -7,13 +7,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
@@ -90,7 +89,7 @@ public class FilePersonRepositoryTest {
 
         assertThat(people.size(), is(4));
         verify(ioUtil).readDataFile();
-        verify(people, times(2)).get(2);
+        verify(people).get(2);
         verify(person).setId(4L);
         verify(people).add(person);
         verify(ioUtil).writeToDataFile(people);
@@ -105,16 +104,53 @@ public class FilePersonRepositoryTest {
         Person actual = new Person();
         actual.setFirstname("Test");
         actual.setSurname("Test");
-        Person person = spy(actual);
 
-        personRepository.save(person);
+        personRepository.save(actual);
 
-        assertThat(people.size(), is(1));
         verify(ioUtil).readDataFile();
-        verify(person).setId(1L);
-        verify(people).add(person);
-        verify(ioUtil).writeToDataFile(people);
+        verify(ioUtil).writeToDataFile(any());
         verifyNoMoreInteractions(ioUtil);
+    }
+
+    @Test
+    public void shouldAddPersonToListWithAllValuesSet() throws Exception {
+        List<Person> people = new ArrayList<>(createTestArray());
+        Person person = new Person();
+        person.setId(9L);
+        person.setFirstname("Test");
+        person.setSurname("Tester");
+
+        List<Person> result = personRepository.updateListWithPerson(people, person);
+
+        assertThat(result.size(), is(4));
+        assertThat(result.get(3), is(person));
+    }
+
+    @Test
+    public void shouldAddPersonToListWithNoIdSet() throws Exception {
+        List<Person> people = new ArrayList<>(createTestArray());
+        Person person = new Person();
+        person.setFirstname("Test");
+        person.setSurname("Tester");
+
+        List<Person> result = personRepository.updateListWithPerson(people, person);
+
+        assertThat(result.size(), is(4));
+        assertThat(result.get(3), is(person));
+    }
+
+    @Test
+    public void shouldReplacePersonWhenAlreadyExists() throws Exception {
+        List<Person> people = new ArrayList<>(createTestArray());
+        Person person = new Person();
+        person.setId(1L);
+        person.setFirstname("Test");
+        person.setSurname("Tester");
+
+        List<Person> result = personRepository.updateListWithPerson(people, person);
+
+        assertThat(result.size(), is(3));
+        assertThat(result.get(0), is(person));
     }
 
     @Test

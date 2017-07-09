@@ -14,9 +14,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.*;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)

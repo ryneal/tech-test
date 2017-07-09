@@ -11,13 +11,11 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -57,12 +55,16 @@ public class PersonControllerIntegrationTest {
 
     @Test
     public void shouldBeGivenValidationMessageWhenPersonHasNoFirstname() throws Exception {
-        throw new NotImplementedException();
+        this.mockMvc.perform(post("/").param("firstname", "").param("surname", "Smith"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("First Name is required.")));
     }
 
     @Test
     public void shouldBeGivenValidationMessageWhenPersonHasNoSurname() throws Exception {
-        throw new NotImplementedException();
+        this.mockMvc.perform(post("/").param("firstname", "John").param("surname", ""))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Surname is required.")));
     }
 
 }
