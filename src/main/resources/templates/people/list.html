@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments :: head(title=~{::title/text()})">
+<head th:include="fragments :: head">
     <title>People</title>
 </head>
 <body>
@@ -20,7 +20,6 @@
                 </tr>
             </thead>
             <tbody>
-                <!--/*@thymesVar id="people" type="com.github.ryneal.techtest.model.Person"*/-->
                 <tr th:if="${people.empty}">
                     <td colspan="3">No People</td>
                 </tr>
