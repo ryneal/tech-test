@@ -1,7 +1,7 @@
 package com.github.ryneal.techtest.controller;
 
 import com.github.ryneal.techtest.model.Person;
-import com.github.ryneal.techtest.service.PersonService;
+import com.github.ryneal.techtest.repository.PersonRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 public class PersonControllerTest {
 
     @Mock
-    private PersonService personService;
+    private PersonRepository personRepository;
 
     @InjectMocks
     private PersonController personController = new PersonController();
@@ -29,7 +29,7 @@ public class PersonControllerTest {
     @Test
     public void shouldGetListOfPeople() throws Exception {
         List<Person> actual = Arrays.asList(new Person(), new Person(), new Person());
-        when(personService.getPeople()).thenReturn(actual);
+        when(personRepository.findAll()).thenReturn(actual);
 
         ModelAndView modelAndView = personController.list();
         Map<String, Object> model = modelAndView.getModel();
@@ -38,15 +38,17 @@ public class PersonControllerTest {
 
         assertThat(actual, is(result));
         assertThat("people/list", is(viewName));
-        verify(personService).getPeople();
-        verifyNoMoreInteractions(personService);
+        verify(personRepository).findAll();
+        verifyNoMoreInteractions(personRepository);
     }
 
     @Test
     public void shouldGetViewOfPerson() throws Exception {
         Person actual = new Person();
+        actual.setId(77L);
+        when(personRepository.find(actual.getId())).thenReturn(actual);
 
-        ModelAndView modelAndView = personController.view(actual);
+        ModelAndView modelAndView = personController.view(actual.getId());
         Map<String, Object> model = modelAndView.getModel();
         String viewName = modelAndView.getViewName();
         Object result = model.get("person");
@@ -60,7 +62,7 @@ public class PersonControllerTest {
         Long id = 66L;
 
         List<Person> actual = Arrays.asList(new Person());
-        when(personService.getPeople()).thenReturn(actual);
+        when(personRepository.findAll()).thenReturn(actual);
 
         ModelAndView modelAndView = personController.delete(id);
         Map<String, Object> model = modelAndView.getModel();
@@ -69,16 +71,16 @@ public class PersonControllerTest {
 
         assertThat(actual, is(result));
         assertThat("people/list", is(viewName));
-        verify(personService).delete(66L);
-        verify(personService).getPeople();
-        verifyNoMoreInteractions(personService);
+        verify(personRepository).delete(66L);
+        verify(personRepository).findAll();
+        verifyNoMoreInteractions(personRepository);
     }
 
     @Test
     public void shouldCreatePersonAndRedirectToViewPerson() throws Exception {
         Person actual = new Person();
         actual.setId(86L);
-        when(personService.save(any())).thenReturn(actual);
+        when(personRepository.save(any())).thenReturn(actual);
 
         ModelAndView modelAndView = personController.create(actual);
         Map<String, Object> model = modelAndView.getModel();
@@ -87,8 +89,8 @@ public class PersonControllerTest {
 
         assertThat(actual.getId(), is(result));
         assertThat(viewName, is("redirect:/{person.id}"));
-        verify(personService).save(actual);
-        verifyNoMoreInteractions(personService);
+        verify(personRepository).save(actual);
+        verifyNoMoreInteractions(personRepository);
     }
 
 }
