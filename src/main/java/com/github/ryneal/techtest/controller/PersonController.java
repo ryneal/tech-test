@@ -1,5 +1,6 @@
 package com.github.ryneal.techtest.controller;
 
+import com.github.ryneal.techtest.exception.PersonDataException;
 import com.github.ryneal.techtest.exception.PersonNotFoundException;
 import com.github.ryneal.techtest.model.Person;
 import com.github.ryneal.techtest.repository.PersonRepository;
@@ -24,12 +25,12 @@ public class PersonController {
     private PersonRepository personRepository;
 
     @GetMapping
-    public ModelAndView list() {
+    public ModelAndView list() throws PersonDataException {
         return new ModelAndView("people/list", "people", personRepository.findAll());
     }
 
     @GetMapping("edit/{id}")
-    public ModelAndView edit(@PathVariable("id") final Long id) throws PersonNotFoundException {
+    public ModelAndView edit(@PathVariable("id") final Long id) throws PersonNotFoundException, PersonDataException {
         Optional<Person> person = personRepository.find(id);
         return new ModelAndView("people/edit", "person",
                 person.orElseThrow(PersonNotFoundException::new));
@@ -41,26 +42,26 @@ public class PersonController {
     }
 
     @GetMapping("{id}")
-    public ModelAndView view(@PathVariable("id") final Long id) throws PersonNotFoundException {
+    public ModelAndView view(@PathVariable("id") final Long id) throws PersonNotFoundException, PersonDataException {
         Optional<Person> person = personRepository.find(id);
         return new ModelAndView("people/view", "person",
                 person.orElseThrow(PersonNotFoundException::new));
     }
 
     @GetMapping("delete/{id}")
-    public ModelAndView delete(@PathVariable("id") final Long id) {
+    public ModelAndView delete(@PathVariable("id") final Long id) throws PersonDataException {
         personRepository.delete(id);
         List<Person> people = personRepository.findAll();
         return new ModelAndView("people/list", "people", people);
     }
 
-    protected ModelAndView create(final Person person) {
+    protected ModelAndView create(final Person person) throws PersonDataException {
         final Person created = personRepository.save(person);
         return new ModelAndView("redirect:/{person.id}", "person.id", created.getId());
     }
 
     @PostMapping
-    public ModelAndView create(@Valid final Person person, final BindingResult result) {
+    public ModelAndView create(@Valid final Person person, final BindingResult result) throws PersonDataException {
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView("people/edit");
             mav.addObject("person", person);

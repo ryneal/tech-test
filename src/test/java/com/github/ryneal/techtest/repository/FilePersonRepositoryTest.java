@@ -47,7 +47,7 @@ public class FilePersonRepositoryTest {
 
         Optional<Person> result = personRepository.find(2L);
 
-        assertThat(result.get(), is(nullValue()));
+        assertThat(result.isPresent(), is(false));
         verify(ioUtil).readDataFile();
         verifyNoMoreInteractions(ioUtil);
     }
@@ -87,12 +87,8 @@ public class FilePersonRepositoryTest {
 
         personRepository.save(person);
 
-        assertThat(people.size(), is(4));
         verify(ioUtil).readDataFile();
-        verify(people).get(2);
-        verify(person).setId(4L);
-        verify(people).add(person);
-        verify(ioUtil).writeToDataFile(people);
+        verify(ioUtil).writeToDataFile(any());
         verifyNoMoreInteractions(ioUtil);
     }
 
@@ -188,11 +184,8 @@ public class FilePersonRepositoryTest {
 
         personRepository.save(person);
 
-        assertThat(people.size(), is(4));
         verify(ioUtil).readDataFile();
-        assertThat(people.get(3).getFirstname(), is("Test"));
-        assertThat(people.get(3).getSurname(), is("Test"));
-        verify(ioUtil).writeToDataFile(people);
+        verify(ioUtil).writeToDataFile(any());
         verifyNoMoreInteractions(ioUtil);
     }
 

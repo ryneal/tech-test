@@ -1,5 +1,6 @@
 package com.github.ryneal.techtest.repository;
 
+import com.github.ryneal.techtest.exception.PersonDataException;
 import com.github.ryneal.techtest.model.Person;
 import com.github.ryneal.techtest.repository.io.PersonInputOutputUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,12 @@ public class FilePersonRepository implements PersonRepository {
     private PersonInputOutputUtil ioUtil;
 
     @Override
-    public Optional<Person> find(final Long id) {
+    public Optional<Person> find(final Long id) throws PersonDataException {
         return findAll().stream().filter(p -> p.getId().equals(id)).findFirst();
     }
 
     @Override
-    public List<Person> findAll() {
+    public List<Person> findAll() throws PersonDataException {
         List<Person> people = ioUtil.readDataFile();
         if (people == null) {
             return Collections.emptyList();
@@ -32,7 +33,7 @@ public class FilePersonRepository implements PersonRepository {
     }
 
     @Override
-    public Person save(final Person person) {
+    public Person save(final Person person) throws PersonDataException {
         List<Person> people = findAll();
 
         people = updateListWithPerson(people, person);
@@ -61,7 +62,7 @@ public class FilePersonRepository implements PersonRepository {
     }
 
     @Override
-    public void delete(final Long id) {
+    public void delete(final Long id) throws PersonDataException {
         List<Person> people = findAll();
         int index = findIndexOfPersonId(id, people);
         if (index != -1) {

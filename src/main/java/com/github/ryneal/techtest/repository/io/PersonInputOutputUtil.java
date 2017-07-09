@@ -2,6 +2,7 @@ package com.github.ryneal.techtest.repository.io;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.github.ryneal.techtest.exception.PersonDataException;
 import com.github.ryneal.techtest.model.Person;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -18,7 +19,7 @@ public class PersonInputOutputUtil {
 
     private static File DATA_FILE = new File("data.txt");
 
-    public List<Person> readDataFile() {
+    public List<Person> readDataFile() throws PersonDataException {
         try {
             String dataString = asCharSource(DATA_FILE, Charsets.UTF_8).read();
             ObjectMapper mapper = new ObjectMapper();
@@ -26,17 +27,17 @@ public class PersonInputOutputUtil {
                     TypeFactory.defaultInstance().constructCollectionType(List.class,
                             Person.class));
         } catch (IOException e) {
-            return null;
+            throw new PersonDataException();
         }
     }
 
-    public void writeToDataFile(final List<Person> list) {
+    public void writeToDataFile(final List<Person> list) throws PersonDataException {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String valueAsString = mapper.writeValueAsString(list);
             Files.write(valueAsString.getBytes(), DATA_FILE);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new PersonDataException();
         }
     }
 }

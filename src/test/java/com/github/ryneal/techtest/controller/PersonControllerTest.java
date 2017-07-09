@@ -162,11 +162,11 @@ public class PersonControllerTest {
 
         ModelAndView modelAndView = personController.create(actual, results);
         Map<String, Object> model = modelAndView.getModel();
-        Object personId = model.get("person.id");
+        Object person = model.get("person");
         String viewName = modelAndView.getViewName();
 
-        assertThat(actual.getId(), is(personId));
-        assertThat(viewName, is("redirect:edit/{person.id}"));
+        assertThat(actual, is(person));
+        assertThat(viewName, is("people/edit"));
     }
 
     @Test
@@ -185,7 +185,7 @@ public class PersonControllerTest {
         String viewName = modelAndView.getViewName();
 
         assertThat(actual, is(person));
-        assertThat(viewName, is("redirect:/create"));
+        assertThat(viewName, is("people/edit"));
     }
 
 }

@@ -29,17 +29,28 @@ public class TechTestApplicationTests {
 	public void shouldBeAbleToAccessPeoplePage() throws Exception {
 		ResponseEntity<String> entity = this.restTemplate.getForEntity("/", String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(entity.getBody()).contains("<title>People</title>");
+		assertThat(entity.getBody()).contains("<h1>People View All</h1>");
 	}
 
 	@Test
 	public void shouldBeAbleToAccessCreatePage() throws Exception {
-		throw new NotImplementedException();
+		ResponseEntity<String> entity = this.restTemplate.getForEntity("/create", String.class);
+		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(entity.getBody()).contains("<h1>Person Edit/Create</h1>");
 	}
 
 	@Test
-	public void shouldBeAbleToAccessUpdatePersonPage() throws Exception {
-		throw new NotImplementedException();
+	public void shouldBeAbleToAccessViewPersonPage() throws Exception {
+		ResponseEntity<String> entity = this.restTemplate.getForEntity("/1", String.class);
+		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(entity.getBody()).contains("<h1>Person View</h1>");
+	}
+
+	@Test
+	public void shouldBeAbleToAccessEditPersonPage() throws Exception {
+		ResponseEntity<String> entity = this.restTemplate.getForEntity("/edit/1", String.class);
+		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(entity.getBody()).contains("<h1>Person Edit/Create</h1>");
 	}
 
 	@Test
