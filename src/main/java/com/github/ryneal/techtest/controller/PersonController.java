@@ -24,6 +24,17 @@ public class PersonController {
         return new ModelAndView("people/list", "people", personRepository.findAll());
     }
 
+    @GetMapping("edit/{id}")
+    public ModelAndView edit(@PathVariable("id") Long id) {
+        Person person = personRepository.find(id);
+        return new ModelAndView("people/edit", "person", person);
+    }
+
+    @GetMapping("create")
+    public ModelAndView create() {
+        return new ModelAndView("people/edit", "person", new Person());
+    }
+
     @GetMapping("{id}")
     public ModelAndView view(@PathVariable("id") Long id) {
         Person person = personRepository.find(id);

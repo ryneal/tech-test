@@ -101,6 +101,26 @@ public class FilePersonRepositoryTest {
     }
 
     @Test
+    public void shouldSaveNewPersonWhenIdNotSetAndArrayIsEmpty() throws Exception {
+        List<Person> list = new ArrayList<>(Collections.emptyList());
+        List<Person> people = spy(list);
+        when(ioUtil.readDataFile()).thenReturn(people);
+        Person actual = new Person();
+        actual.setFirstname("Test");
+        actual.setSurname("Test");
+        Person person = spy(actual);
+
+        personRepository.save(person);
+
+        assertThat(people.size(), is(1));
+        verify(ioUtil).readDataFile();
+        verify(person).setId(1L);
+        verify(people).add(person);
+        verify(ioUtil).writeToDataFile(people);
+        verifyNoMoreInteractions(ioUtil);
+    }
+
+    @Test
     public void shouldUpdatePersonWhenExistingIdSet() throws Exception {
         List<Person> list = new ArrayList<>(createTestArray());
         List<Person> people = spy(list);

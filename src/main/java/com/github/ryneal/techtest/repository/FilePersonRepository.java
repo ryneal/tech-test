@@ -5,6 +5,7 @@ import com.github.ryneal.techtest.repository.io.PersonInputOutputUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -24,7 +25,7 @@ public class FilePersonRepository implements PersonRepository {
     public List<Person> findAll() {
         List<Person> people = ioUtil.readDataFile();
         if (people == null) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return people;
     }
@@ -32,15 +33,19 @@ public class FilePersonRepository implements PersonRepository {
     @Override
     public Person save(Person person) {
         List<Person> people = findAll();
+        int size = people.size();
 
         if (person.getId() == null) {
-            Long lastId = people.get(people.size()-1).getId();
-            person.setId(lastId + 1);
+            Long newId = 1L;
+            if(size > 0) {
+                newId = people.get(people.size()-1).getId() + 1;
+            }
+            person.setId(newId);
         }
 
         int index = findIndexOfPersonId(person.getId(), people);
 
-        if (index != -1) {
+        if (index != -1 && size > 0) {
             people.set(index, person);
         } else {
             people.add(person);

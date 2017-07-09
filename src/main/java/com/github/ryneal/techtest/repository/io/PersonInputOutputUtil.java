@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.ryneal.techtest.model.Person;
 import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -34,7 +35,7 @@ public class PersonInputOutputUtil {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String valueAsString = mapper.writeValueAsString(list);
-            newWriter(DATA_FILE, Charsets.UTF_8).write(valueAsString);
+            Files.write(valueAsString.getBytes(), DATA_FILE);
         } catch (IOException e) {
             e.printStackTrace();
         }

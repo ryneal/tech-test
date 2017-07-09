@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -90,6 +91,34 @@ public class PersonControllerTest {
         assertThat(actual.getId(), is(result));
         assertThat(viewName, is("redirect:/{person.id}"));
         verify(personRepository).save(actual);
+        verifyNoMoreInteractions(personRepository);
+    }
+
+    @Test
+    public void shouldGetCreateWithNewPersonObject() throws Exception {
+        ModelAndView modelAndView = personController.create();
+        Map<String, Object> model = modelAndView.getModel();
+        Object result = model.get("person");
+        String viewName = modelAndView.getViewName();
+
+        assertThat(result, is(notNullValue()));
+        verifyNoMoreInteractions(personRepository);
+    }
+
+    @Test
+    public void shouldGetEditPageWithExistingPersonObject() throws Exception {
+        Person actual = new Person();
+        actual.setId(77L);
+        when(personRepository.find(actual.getId())).thenReturn(actual);
+
+        ModelAndView modelAndView = personController.edit(77L);
+        Map<String, Object> model = modelAndView.getModel();
+        String viewName = modelAndView.getViewName();
+        Object result = model.get("person");
+
+        assertThat(actual, is(result));
+        assertThat("people/edit", is(viewName));
+        verify(personRepository).find(77L);
         verifyNoMoreInteractions(personRepository);
     }
 

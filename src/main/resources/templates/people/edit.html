@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments :: head">
+    <title>Person</title>
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments :: navbar"></div>
+    <h1>Person Edit/Create</h1>
+    <!--/*@thymesVar id="person" type="com.github.ryneal.techtest.model.Person"*/-->
+    <form id="personEdit" th:action="@{/}" th:object="${person}" action="#" method="post">
+        <input type="hidden" th:field="*{id}"/>
+        <div>
+            <label>First Name</label> <input type="text" th:field="*{firstname}"/>
+        </div>
+        <div>
+            <label>Surname</label> <input type="text" th:field="*{surname}"/>
+        </div>
+        <div class="form-actions">
+            <input type="submit" value="Save" />
+        </div>
+    </form>
+</div>
+</body>
+</html>

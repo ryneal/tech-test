@@ -17,7 +17,7 @@
         <dd id="surname" th:text="${person.surname}"></dd>
     </dl>
     <div class="pull-left">
-        <a th:href="@{'/delete/' + ${person.id}}">delete</a> |
+        <a th:href="@{'/delete/' + ${person.id}}">delete</a> | <a th:href="@{'/edit/' + ${person.id}}">edit</a>
     </div>
 </div>
 </body>

@@ -39,14 +39,20 @@ public class PersonControllerIntegrationTest {
     public void shouldBeAbleToAccessPeoplePage() throws Exception {
         this.mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("<title>People</title>")));
+                .andExpect(content().string(containsString("<h1>People View all</h1>")));
     }
 
     @Test
     public void shouldBeAbleToCreateAndRedirectToViewNewPerson() throws Exception {
         this.mockMvc.perform(post("/").param("firstname", "John").param("surname", "Smith"))
-                .andExpect((status().isOk()))
-                .andExpect(redirectedUrlPattern("/[0-9]+"));
+                .andExpect((status().is(302)));
+    }
+
+    @Test
+    public void shouldBeAbleToGoToCreatePage() throws Exception {
+        this.mockMvc.perform(get("/create"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("<h1>Person Edit/Create</h1>")));
     }
 
     @Test
