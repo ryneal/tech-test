@@ -39,7 +39,7 @@ public class PersonControllerIntegrationTest {
     public void shouldBeAbleToAccessPeoplePage() throws Exception {
         this.mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("<h1>People View all</h1>")));
+                .andExpect(content().string(containsString("<h1>People View All</h1>")));
     }
 
     @Test

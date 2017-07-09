@@ -7,14 +7,19 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -120,6 +125,68 @@ public class PersonControllerTest {
         assertThat("people/edit", is(viewName));
         verify(personRepository).find(77L);
         verifyNoMoreInteractions(personRepository);
+    }
+
+    @Test
+    public void shouldReturnNoErrorsIfBindingResultErrorsNotSet() throws Exception {
+        BindingResult results = mock(BindingResult.class);
+        when(results.hasErrors()).thenReturn(false);
+        Person actual = new Person();
+        actual.setId(888L);
+        when(personRepository.save(actual)).thenReturn(actual);
+
+        ModelAndView modelAndView = personController.create(actual, results);
+        Map<String, Object> model = modelAndView.getModel();
+        Object personId = model.get("person.id");
+        Object errors = model.get("errors");
+        String viewName = modelAndView.getViewName();
+
+        assertThat(actual.getId(), is(personId));
+        assertThat(errors, is(nullValue()));
+        assertThat(viewName, is("redirect:/{person.id}"));
+    }
+
+    @Test
+    public void shouldReturnErrorsIfBindingResultErrorsNotSet() throws Exception {
+        ObjectError error = mock(ObjectError.class);
+        BindingResult results = mock(BindingResult.class);
+        when(results.hasErrors()).thenReturn(true);
+        List<ObjectError> errorList = Collections.singletonList(error);
+        when(results.getAllErrors()).thenReturn(errorList);
+        Person actual = new Person();
+        actual.setId(888L);
+        when(personRepository.save(actual)).thenReturn(actual);
+
+        ModelAndView modelAndView = personController.create(actual, results);
+        Map<String, Object> model = modelAndView.getModel();
+        Object personId = model.get("person.id");
+        Object errors = model.get("errors");
+        String viewName = modelAndView.getViewName();
+
+        assertThat(actual.getId(), is(personId));
+        assertThat(errors, is(errorList));
+        assertThat(viewName, is("redirect:/{person.id}"));
+    }
+
+    @Test
+    public void shouldRedirectToCreatePageIfPersonIdIsNotSetAndValidationErrorsAvailable() throws Exception {
+        ObjectError error = mock(ObjectError.class);
+        BindingResult results = mock(BindingResult.class);
+        when(results.hasErrors()).thenReturn(true);
+        List<ObjectError> errorList = Collections.singletonList(error);
+        when(results.getAllErrors()).thenReturn(errorList);
+        Person actual = new Person();
+        when(personRepository.save(actual)).thenReturn(actual);
+
+        ModelAndView modelAndView = personController.create(actual, results);
+        Map<String, Object> model = modelAndView.getModel();
+        Object person = model.get("person");
+        Object errors = model.get("errors");
+        String viewName = modelAndView.getViewName();
+
+        assertThat(actual, is(person));
+        assertThat(errors, is(errorList));
+        assertThat(viewName, is("redirect:/create"));
     }
 
 }
