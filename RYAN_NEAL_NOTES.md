@@ -22,3 +22,4 @@ I loosely followed a similar pattern for my PersonRepository as that of Spring J
 
 * Handle the IO better. I considered using Redis for in-memory storage and having the backup capability to store the data to file periodically.
 * Prettier UI errors. Add some custom views for the checked exceptions that are thrown.
+* Separate into a REST controller with proper CRUD endpoints, and establish an Angular2 front end
